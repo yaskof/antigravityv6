@@ -15,26 +15,31 @@ const platformPalette = {
     badge: "bg-orange-100 text-orange-700",
     ring: "ring-orange-200",
     dot: "bg-orange-500",
+    color: "orange",
   },
   "Getir Yemek": {
     badge: "bg-purple-100 text-purple-700",
     ring: "ring-purple-200",
     dot: "bg-purple-500",
+    color: "purple",
   },
   Yemeksepeti: {
     badge: "bg-pink-100 text-pink-700",
     ring: "ring-pink-200",
     dot: "bg-pink-500",
+    color: "pink",
   },
   "Migros Yemek": {
     badge: "bg-emerald-100 text-emerald-700",
     ring: "ring-emerald-200",
     dot: "bg-emerald-500",
+    color: "emerald",
   },
   "Manuel Sipariş": {
     badge: "bg-slate-100 text-slate-700",
     ring: "ring-slate-200",
     dot: "bg-slate-500",
+    color: "slate",
   },
 };
 
@@ -42,7 +47,7 @@ const initialOrders = [
   {
     id: "SP-10452",
     customer: "Ahmet Yılmaz",
-    platform: "Trendyol Go",
+    platform: { name: "Trendyol Go", color: "orange" },
     items: [
       { name: "Sucuklu Pizza", price: 180 },
       { name: "Ayran", price: 20 },
@@ -55,7 +60,7 @@ const initialOrders = [
   {
     id: "SP-10453",
     customer: "Büşra Demir",
-    platform: "Getir Yemek",
+    platform: { name: "Getir Yemek", color: "purple" },
     items: [{ name: "Burger Menü", price: 240 }],
     total: 240,
     status: "preparing",
@@ -65,7 +70,7 @@ const initialOrders = [
   {
     id: "SP-10454",
     customer: "Hasan Kurt",
-    platform: "Yemeksepeti",
+    platform: { name: "Yemeksepeti", color: "pink" },
     items: [{ name: "Tavuk Döner Dürüm", price: 150 }],
     total: 150,
     status: "ready",
@@ -75,7 +80,7 @@ const initialOrders = [
   {
     id: "SP-10455",
     customer: "Zehra Kaya",
-    platform: "Migros Yemek",
+    platform: { name: "Migros Yemek", color: "emerald" },
     items: [{ name: "Mantı", price: 210 }],
     total: 210,
     status: "courier",
@@ -122,6 +127,12 @@ const statusStyles = {
   ready: "bg-emerald-100 text-emerald-700",
   courier: "bg-indigo-100 text-indigo-700",
   delivered: "bg-slate-200 text-slate-600",
+};
+
+const getPlatformName = (platform) => {
+  if (!platform) return "Bilinmeyen Platform";
+  if (typeof platform === "string") return platform;
+  return platform.name ?? "Bilinmeyen Platform";
 };
 
 export default function App() {
@@ -243,10 +254,12 @@ export default function App() {
       return;
     }
 
+    const platformName = formState.platform;
+    const platformMeta = platformPalette[platformName] ?? platformPalette["Manuel Sipariş"];
     const newOrder = {
       id: `SP-${Math.floor(Math.random() * 90000 + 10000)}`,
       customer: formState.customer,
-      platform: formState.platform,
+      platform: { name: platformName, color: platformMeta.color },
       items: [
         {
           name: formState.itemName,
@@ -451,7 +464,8 @@ export default function App() {
                   </div>
                   <div className="mt-4 grid gap-4 lg:grid-cols-2">
                     {orders.map((order) => {
-                      const platform = platformPalette[order.platform];
+                      const platformName = getPlatformName(order.platform);
+                      const platform = platformPalette[platformName];
                       return (
                         <div
                           key={order.id}
@@ -472,7 +486,7 @@ export default function App() {
                               </div>
                               <div>
                                 <p className="text-sm text-slate-500">
-                                  {order.platform}
+                                  {platformName}
                                 </p>
                                 <p className="text-lg font-semibold">
                                   {order.customer}
